@@ -1,0 +1,28 @@
+.ant-card-body {
+  padding: 0px 20px !important;
+}
+
+.card {
+  /* width: 333px; */
+  min-height: 232px;
+  margin: 4px;
+  /* padding: 5px 20px !important; */
+  /* background-color: rgb(154, 152, 152); */
+  /* border: 1px solid #e0e0e0; */
+  /* border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+}
+
+.add-task {
+  display: flex;
+  align-items: center;
+  /* justify-content: space-between; */
+}
+.add-task input {
+  border-bottom-right-radius: 0px !important;
+  border-top-right-radius: 0px !important;
+}
+.add-task button {
+  border-bottom-left-radius: 0px !important;
+  border-top-left-radius: 0px !important;
+}
