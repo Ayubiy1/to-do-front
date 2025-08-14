@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Button, Card, Col, Input, Form, Row } from "antd";
+import { Button, Card, Col, Input, Form, Row, message } from "antd";
 
 import "./lists.css";
 import ListAdd from "./list-add";
@@ -9,8 +9,18 @@ import Tasks from "../tasks";
 import { useState } from "react";
 
 const ListPage = () => {
+  const queryClient = useQueryClient();
+  const [form] = Form.useForm();
   const { name } = useParams();
   const [taskName, setTaskName] = useState(null);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const success = () => {
+    messageApi.open({
+      type: "success",
+      content: "List add successfully",
+    });
+  };
 
   // 1. Boardni name orqali topib, faqat _id ni qaytarish
   const { data: boardId, isLoading: boardLoading } = useQuery({
@@ -23,7 +33,6 @@ const ListPage = () => {
     },
     enabled: !!name,
   });
-
   // 2. Board ID bo‘yicha listlarni olish
   const { data: lists, isLoading: listsLoading } = useQuery({
     queryKey: ["lists", boardId],
@@ -36,20 +45,31 @@ const ListPage = () => {
     },
     enabled: !!boardId, // boardId bo‘lmasa query ishlamaydi
   });
-
   // Add task
-  const { mutate: addTask, isLoading: addTaskLoading } = useQuery({
-    queryKey: ["addTask"],
-    queryFn: async (newTask) => {
+  const { mutate, isLoading: addTaskLoading } = useMutation({
+    mutationFn: async (newTask) => {
+      console.log("Yuborilayotgan ma'lumot:", newTask);
       const res = await axios.post("http://localhost:3000/api/tasks", newTask);
       return res.data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries("tasks");
+      success();
+    },
   });
+
+  const onFinish = (values) => {
+    console.log("Formdan kelgan:", values);
+    mutate(values);
+    // form.resetFields(); // Agar submitdan keyin tozalash kerak bo‘lsa
+  };
 
   if (boardLoading || listsLoading) return <p>Loading...</p>;
 
   return (
     <>
+      {contextHolder}
+
       <div
         style={{
           display: "flex",
@@ -67,28 +87,80 @@ const ListPage = () => {
             <Col key={index} xs={24} sm={12} lg={8} xl={6}>
               <Card className="card">
                 <h3>{list.name}</h3>
-                <Form className="add-task">
-                  <Form.Item>
+                <Form
+                  className="add-task"
+                  form={form}
+                  onFinish={() => {
+                    onFinish({
+                      name: taskName,
+                      listId: list?._id,
+                      completed: false,
+                    });
+                  }}
+                >
+                  <Form.Item
+                    name="name"
+                    rules={[
+                      { required: true, message: "Task nomini kiriting!" },
+                    ]}
+                  >
                     <Input
                       placeholder="edit Task name"
-                      rules={[
-                        { required: true, message: "Task nomini kiriting!" },
-                      ]}
+                      value={taskName}
+                      onChange={(e) => {
+                        setTaskName(e.target.value);
+                      }}
+                      onFocus={() => {
+                        // Faqat birinchi marta fokus bo‘lganda tozalash
+                        if (taskName) {
+                          setTaskName("");
+                          form.setFieldsValue({ taskName: "" });
+                        }
+                      }}
+                    />
+                  </Form.Item>
+
+                  <Form.Item>
+                    <Button
+                      type="primary"
+                      onClick={() => {
+                        onFinish({
+                          name: taskName,
+                          listId: list?._id,
+                          completed: false,
+                        });
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </Form.Item>
+                </Form>
+
+                {/* <Form className="add-task" form={form} onFinish={onFinish}>
+                  <Form.Item
+                    name="taskName"
+                    rules={[
+                      { required: true, message: "Task nomini kiriting!" },
+                    ]}
+                  >
+                    <Input
+                      placeholder="edit Task name"
                       onChange={(e) => setTaskName(e.target.value)}
+                      onClick={() => {
+                        form.resetFields();
+                      }}
                     />
                   </Form.Item>
                   <Form.Item>
                     <Button
                       onClick={() => {
-                        console.log(list?._id);
-                        console.log(taskName);
                       }}
                       type="primary"
                     >
                       Add
                     </Button>
                   </Form.Item>
-                </Form>
+                </Form> */}
 
                 <Tasks listId={list?._id} />
               </Card>
@@ -101,4 +173,3 @@ const ListPage = () => {
 };
 
 export default ListPage;
-
