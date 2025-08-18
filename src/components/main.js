@@ -10,13 +10,16 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useLocalStorageState } from "ahooks";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import BoardEdit from "../BoardEdit";
 
 const { Header, Content, Sider } = Layout;
 
 const MainComp = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [selectedBoardId, setSelectedBoardId] = useState(null);
 
   const [collapsed, setCollapsed] = useLocalStorageState(
     "userLayoutCollapsed",
@@ -39,10 +42,31 @@ const MainComp = () => {
     queryFn: async () => await axios.get(`http://localhost:3000/api/boards`),
     onSuccess: (data) => {},
   });
+  const { data: boardDataa } = useQuery({
+    queryKey: ["board-data-one", location.pathname],
+    queryFn: async () =>
+      await axios.get(
+        `http://localhost:3000/api/boards/${location.pathname.slice(1)}`
+      ),
+    onSuccess: (data) => {},
+  });
 
   useEffect(() => {
-    setBoardData(data?.data[0].name);
-  }, []);
+    if (selectedBoardId === null && location.pathname === "/") {
+      setSelectedKeys(1);
+      navigate(`/${data?.data[0]._id}`);
+      setBoardData(data?.data[0].name);
+    }
+  }, [selectedBoardId, location.pathname, data]);
+
+  useEffect(() => {
+    if (localStorage.getItem("token") && data?.data && data?.data.length > 0) {
+      setSelectedBoardId(data?.data[0]._id); // birinchi board
+      // navigate(`/${data?.data[0].name}`);
+      setCollapsed(false);
+      // setSelectedKeys(1);
+    }
+  }, [data]);
 
   const handleLogout = async () => {};
 
@@ -58,15 +82,35 @@ const MainComp = () => {
           {!isLoading
             ? data?.data?.map((item, index) => {
                 return (
-                  <Menu.Item
-                    key={index + 1}
-                    onClick={() => {
-                      navigate(`${item.name}`);
-                      setBoardData(item.name);
-                      setSelectedKeys(index + 1);
-                    }}
-                  >
-                    {!collapsed ? item.name : index + 1}
+                  <Menu.Item key={index + 1} style={{ padding: "0 5px" }}>
+                    {!collapsed ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          color: "white",
+                          gap: "10px",
+                          width: "100%",
+                        }}
+                        onClick={() => {
+                          navigate(`${item._id}`);
+                          setBoardData(item.name);
+                          setSelectedKeys(index + 1);
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: "100%",
+                          }}
+                        >
+                          {item.name}
+                        </span>
+                        <BoardEdit boardId={item?._id} />
+                      </div>
+                    ) : (
+                      index + 1
+                    )}
                   </Menu.Item>
                 );
               })
@@ -106,13 +150,16 @@ const MainComp = () => {
               }}
             />
             <h1 className="text-lg font-semibold" style={{ margin: "0" }}>
-              {location.pathname.replace(/%20/g, " ").slice(1)}
+              {boardDataa?.data?.name}
             </h1>
           </div>
 
           <Button
             type="primary"
-            onClick={handleLogout}
+            onClick={() => {
+              handleLogout();
+              navigate("/login");
+            }}
             icon={<LogoutOutlined />}
           >
             Chiqish

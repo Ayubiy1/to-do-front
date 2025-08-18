@@ -7,11 +7,12 @@ import "./lists.css";
 import ListAdd from "./list-add";
 import Tasks from "../tasks";
 import { useState } from "react";
+import ListEdit from "./edit-list";
 
 const ListPage = () => {
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
-  const { name } = useParams();
+  const { _id } = useParams();
   const [taskName, setTaskName] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -22,16 +23,15 @@ const ListPage = () => {
     });
   };
 
-  // 1. Boardni name orqali topib, faqat _id ni qaytarish
   const { data: boardId, isLoading: boardLoading } = useQuery({
-    queryKey: ["boardId", name],
+    queryKey: ["board-Id", _id],
     queryFn: async () => {
-      const res = await axios.get(`http://localhost:3000/api/boards`);
-      const board = res.data.find((b) => b.name === name);
-      if (!board) throw new Error("Board topilmadi");
-      return board._id; // faqat _id qaytadi
+      const res = await axios.get(`http://localhost:3000/api/boards/${_id}`);
+
+      if (!res) throw new Error("Board topilmadi");
+      return res?.data._id; // faqat _id qaytadi
     },
-    enabled: !!name,
+    enabled: !!_id,
   });
   // 2. Board ID bo‘yicha listlarni olish
   const { data: lists, isLoading: listsLoading } = useQuery({
@@ -86,7 +86,18 @@ const ListPage = () => {
           return (
             <Col key={index} xs={24} sm={12} lg={8} xl={6}>
               <Card className="card">
-                <h3>{list.name}</h3>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "20px",
+                  }}
+                >
+                  <h3>{list.name}</h3>
+
+                  <ListEdit listId={list?._id} />
+                </div>
                 <Form
                   className="add-task"
                   form={form}
@@ -135,32 +146,6 @@ const ListPage = () => {
                     </Button>
                   </Form.Item>
                 </Form>
-
-                {/* <Form className="add-task" form={form} onFinish={onFinish}>
-                  <Form.Item
-                    name="taskName"
-                    rules={[
-                      { required: true, message: "Task nomini kiriting!" },
-                    ]}
-                  >
-                    <Input
-                      placeholder="edit Task name"
-                      onChange={(e) => setTaskName(e.target.value)}
-                      onClick={() => {
-                        form.resetFields();
-                      }}
-                    />
-                  </Form.Item>
-                  <Form.Item>
-                    <Button
-                      onClick={() => {
-                      }}
-                      type="primary"
-                    >
-                      Add
-                    </Button>
-                  </Form.Item>
-                </Form> */}
 
                 <Tasks listId={list?._id} />
               </Card>
