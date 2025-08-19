@@ -14,7 +14,9 @@ const TaskEdit = ({ taskId, listId }) => {
   const { data, isLoading: listLoading } = useQuery({
     queryKey: ["task-edit-query", listId],
     queryFn: async () => {
-      const res = await axios.get(`http://localhost:3000/api/tasks/${taskId}`);
+      const res = await axios.get(
+        `https://to-do-backend-5w4r.onrender.com/api/tasks/${taskId}`
+      );
 
       // const list = res.data.find((b) => b._id == listId);
 
@@ -25,7 +27,7 @@ const TaskEdit = ({ taskId, listId }) => {
   const { mutate, isLoading } = useMutation({
     mutationFn: async (upadtedData) => {
       const res = await axios.put(
-        `http://localhost:3000/api/tasks/${taskId}`,
+        `https://to-do-backend-5w4r.onrender.com/api/tasks/${taskId}`,
         upadtedData
       );
       return res.data;

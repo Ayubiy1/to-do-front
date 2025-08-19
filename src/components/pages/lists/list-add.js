@@ -11,7 +11,7 @@ export default function AddListForm({ boardId }) {
       console.log(newListData);
 
       const res = await axios.post(
-        "http://localhost:3000/api/lists",
+        "https://to-do-backend-5w4r.onrender.com/api/lists",
         newListData
       );
       console.log(res);
@@ -77,7 +77,7 @@ export default function AddListForm({ boardId }) {
 //   const { mutate } = useMutation({
 //     mutationFn: async (newListData) => {
 //       const res = await axios.post(
-//         "http://localhost:3000/api/lists",
+//         "https://to-do-backend-5w4r.onrender.com/api/lists",
 //         newListData
 //       );
 //       return res.data.list;
@@ -138,7 +138,7 @@ export default function AddListForm({ boardId }) {
 // //   const { mutate } = useMutation({
 // //     mutationFn: async (newListData) => {
 // //       const res = await axios.post(
-// //         "http://localhost:3000/api/lists",
+// //         "https://to-do-backend-5w4r.onrender.com/api/lists",
 // //         newListData
 // //       );
 // //       return res.data.list;

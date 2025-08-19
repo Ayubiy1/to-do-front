@@ -11,7 +11,7 @@ const Register = () => {
       console.log(newUser);
 
       const res = await axios.post(
-        "http://localhost:3000/api/users/register",
+        "https://to-do-backend-5w4r.onrender.com/api/users/register",
         newUser
       );
       return res.data;

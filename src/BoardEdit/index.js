@@ -14,7 +14,7 @@ const BoardEdit = ({ boardId }) => {
   const { data, isLoading: boardLoading } = useQuery({
     queryKey: ["boardId11", boardId],
     queryFn: async () => {
-      const res = await axios.get(`http://localhost:3000/api/boards`);
+      const res = await axios.get(`http://localhost:https://to-do-backend-5w4r.onrender.com//api/boards`);
 
       const board = res.data.find((b) => b._id == boardId);
 
@@ -24,7 +24,7 @@ const BoardEdit = ({ boardId }) => {
   const { mutate, isLoading } = useMutation({
     mutationFn: async (upadtedData) => {
       const res = await axios.put(
-        `http://localhost:3000/api/boards/${boardId}`,
+        `http://localhost:https://to-do-backend-5w4r.onrender.com//api/boards/${boardId}`,
         upadtedData
       );
       return res.data;

@@ -26,7 +26,9 @@ const ListPage = () => {
   const { data: boardId, isLoading: boardLoading } = useQuery({
     queryKey: ["board-Id", _id],
     queryFn: async () => {
-      const res = await axios.get(`http://localhost:3000/api/boards/${_id}`);
+      const res = await axios.get(
+        `https://to-do-backend-5w4r.onrender.com/api/boards/${_id}`
+      );
 
       if (!res) throw new Error("Board topilmadi");
       return res?.data._id; // faqat _id qaytadi
@@ -37,7 +39,9 @@ const ListPage = () => {
   const { data: lists, isLoading: listsLoading } = useQuery({
     queryKey: ["lists", boardId],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/lists");
+      const res = await axios.get(
+        "https://to-do-backend-5w4r.onrender.com/api/lists"
+      );
 
       // Agar backend array qaytarsa
       const filtered = res.data.filter((list) => list.boardId === boardId);
@@ -49,7 +53,10 @@ const ListPage = () => {
   const { mutate, isLoading: addTaskLoading } = useMutation({
     mutationFn: async (newTask) => {
       console.log("Yuborilayotgan ma'lumot:", newTask);
-      const res = await axios.post("http://localhost:3000/api/tasks", newTask);
+      const res = await axios.post(
+        "https://to-do-backend-5w4r.onrender.com/api/tasks",
+        newTask
+      );
       return res.data;
     },
     onSuccess: () => {

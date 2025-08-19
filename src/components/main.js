@@ -39,14 +39,19 @@ const MainComp = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ["user", location.pathname],
-    queryFn: async () => await axios.get(`http://localhost:3000/api/boards`),
+    queryFn: async () =>
+      await axios.get(
+        `http://localhost:https://to-do-backend-5w4r.onrender.com/api/boards`
+      ),
     onSuccess: (data) => {},
   });
   const { data: boardDataa } = useQuery({
     queryKey: ["board-data-one", location.pathname],
     queryFn: async () =>
       await axios.get(
-        `http://localhost:3000/api/boards/${location.pathname.slice(1)}`
+        `http://localhost:https://to-do-backend-5w4r.onrender.com/api/boards/${location.pathname.slice(
+          1
+        )}`
       ),
     onSuccess: (data) => {},
   });

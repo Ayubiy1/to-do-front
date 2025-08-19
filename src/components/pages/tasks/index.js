@@ -6,7 +6,9 @@ const Tasks = ({ listId }) => {
   const { data, isLoading: tasksLoading } = useQuery({
     queryKey: ["tasks", listId],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/tasks");
+      const res = await axios.get(
+        "https://to-do-backend-5w4r.onrender.com/api/tasks"
+      );
 
       return res.data.filter((task) => task.listId === listId);
     },
